@@ -39,7 +39,7 @@ class TapVismaERP(Tap):
             "start_date",
             th.DateTimeType,
             description="The earliest record date to sync",
-            default="2022-10-01",
+            default="2019-01-01",
         ),
     ).to_dict()
 
@@ -51,6 +51,11 @@ class TapVismaERP(Tap):
         """
         return [
             streams.DepartmentStream(self),
+            streams.LedgerStream(self),
+            streams.SubAccountStream(self),
+            streams.AccountStream(self),
+            streams.GeneralLedgerBalanceStream(self),
+            streams.BudgetStream(self),
         ]
 
 
