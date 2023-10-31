@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
 import requests
+from requests import Response
 from singer_sdk.helpers.jsonpath import extract_jsonpath
-from singer_sdk.pagination import BaseAPIPaginator  # noqa: TCH002
+from singer_sdk.pagination import BaseAPIPaginator, BasePageNumberPaginator  # noqa: TCH002
 from singer_sdk.streams import RESTStream
 
 from tap_visma_erp.auth import VismaERPAuthenticator
@@ -19,13 +19,34 @@ _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
+class SimplePaginator(BasePageNumberPaginator):
+    """Custom paginator"""
+
+    def has_more(self, response: Response) -> bool:
+        """If records have a `metadata` key pagination is possible. We keep fetching until no records returned.
+
+        Args:
+            response: API response object.
+
+        Returns:
+            Boolean flag used to indicate if the endpoint has more pages.
+        """
+        data = response.json()
+
+        if len(data) > 0 and "metadata" in data[-1]:
+            return True
+        else:
+            return False
+    
+
+
 class VismaERPStream(RESTStream):
     """VismaERP stream class."""
 
     @property
     def url_base(self) -> str:
         """Return the API URL root"""
-        return "https://integration.visma.net/API/controller/api/v1"
+        return "https://integration.visma.net/API"
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
 
@@ -54,19 +75,7 @@ class VismaERPStream(RESTStream):
         return headers
 
     def get_new_paginator(self) -> BaseAPIPaginator:
-        """Create a new pagination helper instance.
-
-        If the source API can make use of the `next_page_token_jsonpath`
-        attribute, or it contains a `X-Next-Page` header in the response
-        then you can remove this method.
-
-        If you need custom pagination that uses page numbers, "next" links, or
-        other approaches, please read the guide: https://sdk.meltano.com/en/v0.25.0/guides/pagination-classes.html.
-
-        Returns:
-            A pagination helper instance.
-        """
-        return super().get_new_paginator()
+        return SimplePaginator(start_value=1)
 
     def get_url_params(
         self,
@@ -82,12 +91,15 @@ class VismaERPStream(RESTStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        params: dict = {}
+        params: dict = {
+            "pageSize": 1000,
+        }
         if next_page_token:
-            params["page"] = next_page_token
+            params["pageNumber"] = next_page_token
+
         if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
+            params["lastModifiedDateTime"] = self.get_starting_timestamp(context)
+        
         return params
 
     def prepare_request_payload(
