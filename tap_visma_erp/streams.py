@@ -31,7 +31,7 @@ class AccountStream(VismaERPStream):
 
     name = "account"
     path = "/controller/api/v1/account"
-    primary_keys = ["departmentId"]
+    primary_keys = ["accountID"]
 
     schema = th.PropertiesList(
         th.Property("accountID", th.IntegerType),
