@@ -182,6 +182,6 @@ class GeneralLedgerBalanceStream(VismaERPStream):
         th.Property("periodToDateCreditInCurrency", th.NumberType),
         th.Property("beginningBalanceInCurrency", th.NumberType),
         th.Property("yearToDateBalanceInCurrency", th.NumberType),
-        th.Property("yearClosed", th.StringType),
+        th.Property("yearClosed", th.BooleanType),
         th.Property("lastModifiedDateTime", th.DateTimeType),
     ).to_dict()
