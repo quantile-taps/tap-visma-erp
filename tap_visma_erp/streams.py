@@ -12,7 +12,7 @@ from tap_visma_erp.client import VismaERPStream
 class DepartmentStream(VismaERPStream):
     """Fetch departments from Visma."""
 
-    name = "department"
+    name = "departments"
     path = "/controller/api/v1/department"
     primary_keys = ["departmentId"]
 
@@ -29,7 +29,7 @@ class DepartmentStream(VismaERPStream):
 class AccountStream(VismaERPStream):
     """Fetch accounts from Visma."""
 
-    name = "account"
+    name = "accounts"
     path = "/controller/api/v1/account"
     primary_keys = ["accountID"]
 
@@ -49,7 +49,7 @@ class AccountStream(VismaERPStream):
 class LedgerStream(VismaERPStream):
     """Fetch ledgers from Visma."""
 
-    name = "ledger"
+    name = "ledgers"
     path = "/controller/api/v1/ledger"
     primary_keys = ["internalId"]
 
@@ -68,7 +68,7 @@ class LedgerStream(VismaERPStream):
 class SubAccountStream(VismaERPStream):
     """Fetch sub accounts from Visma."""
 
-    name = "subaccount"
+    name = "subaccounts"
     path = "/controller/api/v1/subaccount"
     primary_keys = ["subaccountId"]
 
@@ -91,7 +91,7 @@ class SubAccountStream(VismaERPStream):
 class BudgetStream(VismaERPStream):
     """Fetch budgets from Visma."""
 
-    name = "budget"
+    name = "budgets"
     path = "/controller/api/v1/budget"
     primary_keys = ["financialYear"]
 
@@ -154,7 +154,7 @@ class BudgetStream(VismaERPStream):
 class GeneralLedgerBalanceStream(VismaERPStream):
     """Fetch general ledger balances from Visma."""
 
-    name = "general_ledger_balance"
+    name = "general_ledger_balances"
     path = "/controller/api/v2/generalLedgerBalance"
     replication_key = "lastModifiedDateTime"
     primary_keys = ["balanceType", "financialPeriod", "subaccountId"]
