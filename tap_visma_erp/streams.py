@@ -93,8 +93,6 @@ class BudgetStream(VismaERPStream):
 
     name = "budgets"
     path = "/controller/api/v1/budget"
-    primary_keys = ["financialYear"]
-
     partitions = [
         {"financialYear": year} 
             for year in range(2020, datetime.datetime.now().year + 1)
@@ -157,7 +155,6 @@ class GeneralLedgerBalanceStream(VismaERPStream):
     name = "general_ledger_balances"
     path = "/controller/api/v2/generalLedgerBalance"
     replication_key = "lastModifiedDateTime"
-    primary_keys = ["balanceType", "financialPeriod", "subaccountId"]
 
     schema = th.PropertiesList(
         th.Property("ledger", th.ObjectType(
