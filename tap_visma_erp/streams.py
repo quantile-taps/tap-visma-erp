@@ -156,7 +156,7 @@ class GeneralLedgerBalanceStream(VismaERPStream):
 
     name = "general_ledger_balances"
     path = "/controller/api/v2/generalLedgerBalance"
-    # replication_key = "lastModifiedDateTime"
+    replication_key = "lastModifiedDateTime"
     primary_keys = ["balanceType", "financialPeriod", "subaccountId"]
 
     schema = th.PropertiesList(
