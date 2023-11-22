@@ -106,7 +106,6 @@ class BudgetStream(VismaERPStream):
         th.Property("account__type", th.StringType),
         th.Property("account__number", th.StringType),
         th.Property("subaccount__id", th.StringType),
-        th.Property("subaccount__description", th.StringType),
         th.Property("description", th.StringType),
         th.Property("amount", th.NumberType),
         th.Property("distributedAmount", th.NumberType),
