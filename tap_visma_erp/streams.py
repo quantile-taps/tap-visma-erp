@@ -93,6 +93,7 @@ class BudgetStream(VismaERPStream):
 
     name = "budgets"
     path = "/controller/api/v1/budget"
+    primary_keys = ["financialYear", "account__number", "subaccount__id"]
     partitions = [
         {"financialYear": year} 
             for year in range(2020, datetime.datetime.now().year + 1)
@@ -102,15 +103,10 @@ class BudgetStream(VismaERPStream):
         th.Property("financialYear", th.StringType),
         th.Property("released", th.BooleanType),
         th.Property("releasedAmount", th.NumberType),
-        th.Property("account", th.ObjectType(
-            th.Property("type", th.StringType),
-            th.Property("number", th.StringType),
-            th.Property("description", th.StringType),
-        )),
-        th.Property("subaccount", th.ObjectType(
-            th.Property("id", th.StringType),
-            th.Property("description", th.StringType),
-        )),
+        th.Property("account__type", th.StringType),
+        th.Property("account__number", th.StringType),
+        th.Property("subaccount__id", th.StringType),
+        th.Property("subaccount__description", th.StringType),
         th.Property("description", th.StringType),
         th.Property("amount", th.NumberType),
         th.Property("distributedAmount", th.NumberType),
@@ -126,6 +122,22 @@ class BudgetStream(VismaERPStream):
             th.Property("name", th.StringType),
         )),
     ).to_dict()
+
+    def post_process(
+        self,
+        row: dict,
+        context: dict | None = None,  # noqa: ARG002
+    ) -> dict | None:
+        """
+        Unnest properties so they can be used as primary_keys.
+        """
+        row["account__type"] = row["account"].get("type")
+        row["account__number"] = row["account"].get("number")
+        row["account__description"] = row["account"].get("description")
+        row["subaccount__id"] = row["subaccount"].get("id")
+
+        return row
+
 
     def get_url_params(
         self,
@@ -154,20 +166,17 @@ class GeneralLedgerBalanceStream(VismaERPStream):
 
     name = "general_ledger_balances"
     path = "/controller/api/v2/generalLedgerBalance"
+    primary_keys = ["ledger__id", "financialPeriod", "account__number", "subaccountId"]
     replication_key = "lastModifiedDateTime"
 
     schema = th.PropertiesList(
-        th.Property("ledger", th.ObjectType(
-            th.Property("id", th.StringType),
-            th.Property("description", th.StringType),
-        )),
+        th.Property("ledger__id", th.StringType),
+        th.Property("ledger__description", th.StringType),
         th.Property("balanceType", th.StringType),
         th.Property("financialPeriod", th.StringType),
-        th.Property("account", th.ObjectType(
-            th.Property("type", th.StringType),
-            th.Property("number", th.StringType),
-            th.Property("description", th.StringType),
-        )),
+        th.Property("account__type", th.StringType),
+        th.Property("account__number", th.StringType),
+        th.Property("account__description", th.StringType),
         th.Property("subaccountId", th.StringType),
         th.Property("subAccountCd", th.StringType),
         th.Property("currencyId", th.StringType),
@@ -182,3 +191,19 @@ class GeneralLedgerBalanceStream(VismaERPStream):
         th.Property("yearClosed", th.BooleanType),
         th.Property("lastModifiedDateTime", th.DateTimeType),
     ).to_dict()
+
+    def post_process(
+        self,
+        row: dict,
+        context: dict | None = None,  # noqa: ARG002
+    ) -> dict | None:
+        """
+        Unnest properties so they can be used as primary_keys.
+        """
+        row["ledger__id"] = row["ledger"].get("id")
+        row["ledger__description"] = row["ledger"].get("description")
+        row["account__type"] = row["account"].get("type")
+        row["account__number"] = row["account"].get("number")
+        row["account__description"] = row["account"].get("description")
+
+        return row
