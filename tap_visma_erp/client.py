@@ -17,6 +17,7 @@ from singer_sdk.streams import RESTStream
 from tap_visma_erp.auth import VismaERPAuthenticator
 
 from functools import cached_property
+import pendulum
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -100,8 +101,10 @@ class VismaERPStream(RESTStream):
             params["pageNumber"] = next_page_token
 
         if self.replication_key:
-            params["lastModifiedDateTime"] = self.get_starting_timestamp(
-                context
+
+            starting_timestamp = self.get_starting_timestamp(context)
+            params["lastModifiedDateTime"] = pendulum.instance(
+                starting_timestamp
             ).to_datetime_string()
 
         return params
