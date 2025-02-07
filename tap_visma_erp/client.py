@@ -8,7 +8,10 @@ from typing import Any, Callable, Iterable
 import requests
 from requests import Response
 from singer_sdk.helpers.jsonpath import extract_jsonpath
-from singer_sdk.pagination import BaseAPIPaginator, BasePageNumberPaginator  # noqa: TCH002
+from singer_sdk.pagination import (
+    BaseAPIPaginator,
+    BasePageNumberPaginator,
+)  # noqa: TCH002
 from singer_sdk.streams import RESTStream
 
 from tap_visma_erp.auth import VismaERPAuthenticator
@@ -37,7 +40,6 @@ class SimplePaginator(BasePageNumberPaginator):
             return True
         else:
             return False
-    
 
 
 class VismaERPStream(RESTStream):
@@ -98,8 +100,18 @@ class VismaERPStream(RESTStream):
             params["pageNumber"] = next_page_token
 
         if self.replication_key:
-            params["lastModifiedDateTime"] = self.get_starting_timestamp(context).to_datetime_string()
-        
+            import logging
+
+            logging.info(self.get_starting_timestamp(context))
+
+            logging.info(type(self.get_starting_timestamp(context)))
+
+            logging.info("lastModifiedDateTime")
+
+            params["lastModifiedDateTime"] = self.get_starting_timestamp(
+                context
+            ).to_datetime_string()
+
         return params
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
