@@ -100,14 +100,6 @@ class VismaERPStream(RESTStream):
             params["pageNumber"] = next_page_token
 
         if self.replication_key:
-            import logging
-
-            logging.info(self.get_starting_timestamp(context))
-
-            logging.info(type(self.get_starting_timestamp(context)))
-
-            logging.info("lastModifiedDateTime")
-
             params["lastModifiedDateTime"] = self.get_starting_timestamp(
                 context
             ).to_datetime_string()
