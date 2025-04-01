@@ -49,7 +49,7 @@ class VismaERPStream(RESTStream):
     @property
     def url_base(self) -> str:
         """Return the API URL root"""
-        return "https://integration.visma.net/API"
+        return "https://api.finance.visma.net/API"
 
     records_jsonpath = "$[*]"  # Or override `parse_response`.
 
