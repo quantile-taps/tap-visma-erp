@@ -13,7 +13,7 @@ from singer_sdk.pagination import (
     BasePageNumberPaginator,
 )  # noqa: TCH002
 from singer_sdk.streams import RESTStream
-
+import logging
 from tap_visma_erp.auth import VismaERPAuthenticator
 
 from functools import cached_property
@@ -37,7 +37,11 @@ class SimplePaginator(BasePageNumberPaginator):
         """
         data = response.json()
 
-        if len(data) > 0 and "metadata" in data[-1]:
+        # Stopping condition in case there is only one page
+        if len(data) > 0 and data[-1]["metadata"]["totalCount"] < 1000:
+            return False
+        # Continuation condition if there are more records to be fetched
+        elif len(data) > 0 and "metadata" in data[-1]:
             return True
         else:
             return False
