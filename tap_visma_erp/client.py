@@ -37,12 +37,19 @@ class SimplePaginator(BasePageNumberPaginator):
         """
         data = response.json()
 
-        # Stopping condition in case there is only one page
+        # For some endpoints, the metadata key is not present in the response. Therefore, 
+        # we return False if the response doesn't contain metadata.
+        if not data or "metadata" not in data[-1]:
+            return False
+
+        # Stopping condition in case there is only one page and the metadata key is present.
         if len(data) > 0 and data[-1]["metadata"]["totalCount"] < 1000:
             return False
+        
         # Continuation condition if there are more records to be fetched
         elif len(data) > 0 and "metadata" in data[-1]:
             return True
+        
         else:
             return False
 
